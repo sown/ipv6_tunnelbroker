@@ -1,0 +1,41 @@
+local 10.0.0.1
+lport 1194
+proto tcp-server
+dev ovpntun6
+dev-type tun
+dev-node /dev/net/tun
+ca /etc/openvpn/tunnelbroker/ca/intermediate/certs/ca-chain.cert.pem
+cert /etc/openvpn/tunnelbroker/ca/intermediate/certs/server.cert.pem
+key /etc/openvpn/tunnelbroker/ca/intermediate/private/server.key.pem
+dh /etc/openvpn/tunnelbroker/dh1024.pem
+server 10.0.1.0 255.255.255.0
+server-ipv6 fd1b:4d83:cebc:9400::/64
+push "route-ipv6 ::/0"
+push "dhcp-option DNS6 fd91:65a6:5556:8204:123:45ff:fe67:89ab"
+push "register-dns"
+keepalive 10 60
+user openvpn
+group nogroup
+persist-tun
+persist-key
+log-append /etc/openvpn/ipv6_tunnelbroker/logs/server.log
+status /etc/openvpn/ipv6_tunnelbroker/logs/server-status.log
+writepid /var/run/ipv6_tunnelbroker-server.pid
+verb 3
+script-security 2
+cipher AES-256-CBC
+auth SHA256
+daemon
+max-clients 100
+ping-timer-rem
+tls-server
+tls-verify "/etc/openvpn/ipv5_tunnelbroker/sbin/ovpncncheck.sh /etc/openvpn/tunnelbroker/userlist.txt"
+tls-auth /etc/openvpn/ipv6_tunnelbroker/ta.key 0
+client-config-dir /etc/openvpn/ipv6_tunnelbroker/ccd
+management /etc/openvpn/ipv6_tunnelbroker/server.sock unix
+crl-verify /etc/openvpn/ipv6_tunnelbroker/ca/intermediate/crl/intermediate.crl.pem
+persist-remote-ip
+float
+topology net30
+client-connect /etc/openvpn/ipv6_tunnelbroker/sbin/client-connect.sh
+client-disconnect /etc/openvpn/ipv6_tunnelbroker/sbin/client-disconnect.sh

@@ -1,0 +1,9 @@
+ca/
+ccd/*
+clients/*
+dh1024.pem
+logs/*
+sbin/settings.sh
+server.conf
+ta.key
+userlist.txt
