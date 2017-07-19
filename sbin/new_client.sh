@@ -2,6 +2,7 @@
 d=`dirname $0`
 dir=`cd $d/../; pwd`
 cn_prefix="IPv6_Tunnelbroker_Client_"
+config_dir="ipv6tb"
 if [ -f ${dir}/sbin/settings.sh ]; then
 	source ${dir}/sbin/settings.sh
 fi
@@ -43,23 +44,26 @@ client
 daemon
 dev tun
 proto tcp
+log-append /var/log/${config_dir}_client${id}.log
 remote tunnelbroker.ecs.soton.ac.uk 1194
+remote tunnelbroker.ecs.soton.ac.uk 443
 remote 152.78.180.112 1194
+remote 152.78.180.112 443
 resolv-retry infinite
 nobind
 user nobody
 group nogroup
 persist-key
 persist-tun
-ca /etc/openvpn/ecstb6/ca-chain.cert.pem
-cert /etc/openvpn/ecstb6/client${id}.cert.pem
-key /etc/openvpn/ecstb6/client${id}.key.pem
+ca /etc/openvpn/${config_dir}/ca-chain.cert.pem
+cert /etc/openvpn/${config_dir}/client${id}.cert.pem
+key /etc/openvpn/${config_dir}/client${id}.key.pem
 remote-cert-tls server
-tls-auth /etc/openvpn/ecstb6/ta.key 1
+tls-auth /etc/openvpn/${config_dir}/ta.key 1
 auth SHA256
 cipher AES-256-CBC
 float
-verb 3
+verb 1
 script-security 2
 EOF
 
@@ -68,8 +72,11 @@ cat <<EOF | /usr/bin/unix2dos > $dir/clients/config/client${id}.ovpn
 client
 dev tun
 proto tcp
+log-append client${id}.log
 remote tunnelbroker.ecs.soton.ac.uk 1194
+remote tunnelbroker.ecs.soton.ac.uk 443
 remote 152.78.180.112 1194
+remote 152.78.180.112 443
 resolv-retry infinite
 nobind
 user nobody
@@ -84,26 +91,57 @@ tls-auth ta.key 1
 auth SHA256
 cipher AES-256-CBC
 float
-verb 3
+verb 1
 script-security 2
+EOF
+
+cat <<EOF > $dir/clients/config/client${id}.uci
+config openvpn '${config_dir}'
+    option enable '1'
+    option client '1'
+    option daemon '1'
+    option dev 'tun'
+    option proto 'tcp'
+    option log_append /var/log/${config_dir}_client${id}.log
+    list remote 'tunnelbroker.ecs.soton.ac.uk 1194'
+    list remote 'tunnelbroker.ecs.soton.ac.uk 443'
+    list remote '152.78.180.112 1194'
+    list remote '152.78.180.112 443'
+    option resolv_retry 'infinite'
+    option nobind
+    option user 'nobody'
+    option group 'nogroup'
+    option persist_key '1'
+    option persist_tun '1'
+    option ca '/etc/openvpn/${config_dir}/ca-chain.cert.pem'
+    option cert '/etc/openvpn/${config_dir}/client6.cert.pem'
+    option key '/etc/openvpn/${config_dir}/client6.key.pem'
+    option remote_cert_tls 'server'
+    option tls_auth '/etc/openvpn/${config_dir}/ta.key 1'
+    option auth 'SHA256'
+    option cipher 'AES-256-CBC'
+    option float '1'
+    option verb '1'
+    option script_security '2'
 EOF
 
 
 # Generate client-side tarball for deployment
-tmpdir=`mktemp -p /tmp/ -d ecstb6.XXXXXX`
-mkdir ${tmpdir}/ecstb6
-cp $dir/clients/config/client${id}.conf ${tmpdir}/ecstb6/
-cp $dir/clients/config/client${id}.ovpn ${tmpdir}/ecstb6/
-cp $dir/ta.key ${tmpdir}/ecstb6/
-cp $dir/ca/intermediate/certs/ca-chain.cert.pem ${tmpdir}/ecstb6/
-cp $dir/ca/intermediate/certs/client${id}.cert.pem ${tmpdir}/ecstb6/
-cp $dir/ca/intermediate/private/client${id}.key.pem ${tmpdir}/ecstb6/
-cd ${tmpdir}
-tar -czf $dir/clients/tarballs/client${id}.tar.gz ecstb6/
+tmp_dir=`mktemp -p /tmp/ -d ${config_dir}.XXXXXX`
+mkdir ${tmp_dir}/${config_dir}
+cp $dir/clients/config/client${id}.conf ${tmp_dir}/${config_dir}/
+cp $dir/clients/config/client${id}.ovpn ${tmp_dir}/${config_dir}/
+cp $dir/clients/config/client${id}.uci ${tmp_dir}/${config_dir}/
+cp $dir/ta.key ${tmp_dir}/ecstb6/
+cp $dir/ca/intermediate/certs/ca-chain.cert.pem ${tmp_dir}/${config_dir}/
+cp $dir/ca/intermediate/certs/client${id}.cert.pem ${tmp_dir}/${config_dir}/
+cp $dir/ca/intermediate/private/client${id}.key.pem ${tmp_dir}/${config_dir}/
+cd ${tmp_dir}
+tar -czf $dir/clients/tarballs/client${id}.tar.gz ${config_dir}/
 cd ${dir}
-\rm $tmpdir/ecstb6/*
-rmdir $tmpdir/ecstb6/
-rmdir $tmpdir/
+\rm $tmp_dir/${config_dir}/*
+rmdir $tmp_dir/${config_dir}/
+rmdir $tmp_dir/
 
 # Generate client-config-dir configuration
 cat <<EOF > $dir/ccd/$cn

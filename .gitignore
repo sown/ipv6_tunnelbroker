@@ -6,4 +6,5 @@ logs/*
 sbin/settings.sh
 server.conf
 ta.key
+usage.txt
 userlist.txt
