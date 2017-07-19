@@ -1,3 +1,5 @@
 #!/bin/bash
 cn_prefix="IPv6_Tunnelbroker_Client_"
 config_dir="ipv6tb"
+backuphost="backup.example.org"
+backupuser="backup"
