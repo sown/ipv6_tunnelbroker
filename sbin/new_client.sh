@@ -3,6 +3,7 @@ d=`dirname $0`
 dir=`cd $d/../; pwd`
 cn_prefix="IPv6_Tunnelbroker_Client_"
 config_dir="ipv6tb"
+ipv6_subnet_prefix="fd12::3456:789a:bc"
 if [ -f ${dir}/sbin/settings.sh ]; then
 	source ${dir}/sbin/settings.sh
 fi
@@ -145,8 +146,8 @@ rmdir $tmp_dir/
 
 # Generate client-config-dir configuration
 cat <<EOF > $dir/ccd/$cn
-ifconfig-ipv6-push 2001:630:d0:f300::10${idhex}
-iroute-ipv6 2001:630:d0:f3${idhex}::/64
+ifconfig-ipv6-push ${ipv6_subnet_prefix}00::10${idhex}
+iroute-ipv6 ${ipv6_subnet_prefix}${idhex}::/64
 EOF
 
 # Add new client CN to userlist 
