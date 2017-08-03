@@ -1,5 +1,6 @@
 #!/bin/bash
 cn_prefix="IPv6_Tunnelbroker_Client_"
 config_dir="ipv6tb"
+ipv6_subnet_prefix="fd12:2456:789a:bc"
 backuphost="backup.example.org"
 backupuser="backup"
