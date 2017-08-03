@@ -1,0 +1,3 @@
+dont_blame_nrpe=1
+command[check_cert]=/etc/openvpn/ipv6_tunnelbroker/sbin/check_cert $ARG1$
+command[check_tunnel6]=/etc/openvpn/ipv6_tunnelbroker/sbin/check_tunnel6 $ARG1$

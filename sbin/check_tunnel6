@@ -1,0 +1,34 @@
+#!/bin/bash
+ipv6_tunnelbroker_path="/etc/openvpn/tunnelbroker"
+cn_prefix="IPv6_Tunnelbroker_Client_"
+config_dir="ipv6tb"
+if [ -f ${ipv6_tunnelbroker_path}/sbin/settings.sh ]; then
+        source ${ipv6_tunnelbroker_path}/sbin/settings.sh
+fi
+for tunnel in `grep "^${cn_prefix}" ${ipv6_tunnelbroker_path}/logs/server-status.log | awk 'BEGIN{FS=","}{print $1}'`; do
+	tunnel_id=`echo $tunnel | sed "s/${cn_prefix}//" | sed "s/_Cert//"`
+	if [ "${tunnel_id}" == "$1" ]; then
+		tunnel_id_hex=`printf "%02x" $tunnel_id`
+		endpoint="${ipv6_subnet_prefix}00::10${tunnel_id_hex}"
+		routed_subnet="${ipv6_subnet_prefix}${tunnel_id_hex}"
+                routed=`grep "${cn_prefix}${1}_Cert" ${ipv6_tunnelbroker_path}/logs/server-status.log | awk 'BEGIN{FS=","}{print $1}' | grep ${routed_subnet} | grep -v '/' | sed 's/C$//g' | head -n 1`
+		ping_endpoint=`ping6 -c 1 $endpoint | grep packets | awk 'BEGIN{FS=" "}{print $4}'`
+		if [ "${ping_endpoint}" == "1" ]; then
+			if [ "${routed}" == "" ]; then
+				echo "TUNNEL6-client$1 OK: Tunnel appears up and can ping endpoint but no routed subnet IP to ping."
+				exit 0;
+			fi
+			ping_routed=`ping6 -c 1 $routed | grep packets | awk 'BEGIN{FS=" "}{print $4}'`
+			if [ "${ping_routed}" == "1" ]; then
+				echo "TUNNEL6-client$1 OK: Tunnel appears up and can ping endpoint and routed subnet IP ($routed)"
+        	        	exit 0;
+			fi
+			echo "TUNNEL6-client$1 OK: Tunnel appears up and can ping endpoint but not routed subnet IP ($routed)"
+			exit 0;
+		fi
+		echo "TUNNEL6-client$1 WARNING: Tunnel appears up but cannot ping endpoint ($endpoint)"
+		exit 1;
+	fi
+done
+echo "TUNNEL6-client$1 CRITICAL: Tunnel does not appear to be up."
+exit 2;

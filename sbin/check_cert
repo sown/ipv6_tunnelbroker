@@ -1,0 +1,42 @@
+#!/bin/bash
+CRIT=7
+WARN=30
+while getopts c:w: option
+do
+        case "${option}"
+        in
+                c) CRIT=${OPTARG};;
+                w) WARN=${OPTARG};;
+        esac
+done
+shift $(($OPTIND - 1))
+CERT="/etc/openvpn/tunnelbroker/ca/$1"
+EXPIRE="Not After"
+TYPE="x509"
+if [[ "$1" =~ ".crl" ]]; then
+	EXPIRE="Next Update"
+	TYPE="crl"
+fi
+expdate_formatted=`openssl $TYPE -in $CERT -text -noout | grep "$EXPIRE" | sed 's/^[^:]*: //g'`
+if [ -z "$expdate_formatted" ]; then
+        echo "CERTIFICATE CRITICAL: Certificate ($CERT) expiry date is unknown.  Maybe certificate does not exist or is not readable."
+        exit 2;
+fi
+expdate=`date +%s -d "${expdate_formatted}"`
+curdt=`date +%s`
+critsecs=`expr $curdt + 86400 \* $CRIT`
+warnsecs=`expr $curdt + 86400 \* $WARN`
+
+if [[ $expdate -lt $curdt ]]; then
+	echo "CERTIFICATE CRITICAL: Certificate ($CERT) expired on ${expdate_formatted}"	
+	exit 2;
+elif [[ $expdate -lt $critsecs ]]; then
+        echo "CERTIFICATE CRITICAL: Certificate ($CERT) will expire in less than ${CRIT} days on ${expdate_formatted}"
+        exit 2;
+elif [[ $expdate -lt $warnsecs ]]; then
+        echo "CERTIFICATE WARNING: Certificate ($CERT) will expire in less than ${WARN} days on ${expdate_formatted}"
+        exit 1;
+else
+        echo "CERTIFICATE OK: Certificate ($CERT) will expire on ${expdate_formatted}"
+        exit 0;
+fi
