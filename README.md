@@ -2,7 +2,7 @@
 
 The IPv6 Tunnelbroker is a project to provide fully routed IPv6 connectivity in situations where it is difficult for ISPs to provide it.  Several projects for which we want to use this IPv6 tunnelbroker, include [enviromental sensing in the Cairngorms](http://mountainsensing.org/), [monitor glacier behaviour using sensor networks in Iceland](http://glacsweb.org) and providing IPv6 for a [mobile Cyber Rhino](http://www.ericatherhino.org).
 
-OpenVPN is the application of choice to build this tunnelbroker around.  For cl
+OpenVPN is the application of choice to build this tunnelbroker around.
 
 ## Instructions for Building Certificate Authorities
 These instructions are broadly based on those found at [https://jamielinux.com/docs/openssl-certificate-authority/](https://jamielinux.com/docs/openssl-certificate-authority/).
