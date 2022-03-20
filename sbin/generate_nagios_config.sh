@@ -10,7 +10,9 @@ fi
 # TODO: Currently bespoke for adding to an existing Icinga instance.  Re-code to be more generic and include command and host definitions.
 for client in `grep "^V" ${dir}/ca/intermediate/index.txt | grep -o "${cn_prefix}.*"`; do
 	id=`echo ${client} | sed "s/^${cn_prefix}//" | sed "s/_Cert$//"`
-	echo "# $client
+	monitor=`cat ${dir}/usage.txt | grep -P "^${id}\t" | awk 'BEGIN{FS="\t"}{print $7}'`
+	if [ "$monitor" == "Yes" ]; then
+		echo "# $client
 define service {
 	host_name   		TUNNELBROKER
 	service_description     TUNNEL6-client${id}
@@ -27,4 +29,5 @@ define service {
 }
 
 ";
+	fi
 done
