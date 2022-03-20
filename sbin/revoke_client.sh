@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ `whoami` != "root" ]; then
+        echo "$0 must be run as root or using sudo."
+        exit 1
+fi
 re='^[1-9][0-9]*$'
 if [ $# != 1 ]; then
 	echo -e "No Client ID provided.\n\nUsage: ./revoke_client.sh <client_id>\nE.g. ./revoke_client.sh 4\n"
