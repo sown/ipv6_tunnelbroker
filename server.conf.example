@@ -29,7 +29,7 @@ daemon
 max-clients 100
 ping-timer-rem
 tls-server
-tls-verify "/etc/openvpn/ipv5_tunnelbroker/sbin/ovpncncheck.sh /etc/openvpn/tunnelbroker/userlist.txt"
+tls-verify "/etc/openvpn/ipv6_tunnelbroker/sbin/ovpncncheck.sh /etc/openvpn/tunnelbroker/userlist.txt"
 tls-auth /etc/openvpn/ipv6_tunnelbroker/ta.key 0
 client-config-dir /etc/openvpn/ipv6_tunnelbroker/ccd
 management /etc/openvpn/ipv6_tunnelbroker/server.sock unix
