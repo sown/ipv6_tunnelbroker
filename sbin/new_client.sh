@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ `whoami` != "root" ]; then
+	echo "$0 must be run as root or using sudo."
+	exit 1
+fi
 d=`dirname $0`
 dir=`cd $d/../; pwd`
 cn_prefix="IPv6_Tunnelbroker_Client_"
@@ -48,8 +52,8 @@ proto tcp
 log-append /var/log/${config_dir}_client${id}.log
 remote tunnelbroker.ecs.soton.ac.uk 1194
 remote tunnelbroker.ecs.soton.ac.uk 443
-remote 152.78.180.112 1194
-remote 152.78.180.112 443
+remote 152.78.101.64 1194
+remote 152.78.101.64 443
 resolv-retry infinite
 nobind
 user nobody
@@ -76,8 +80,8 @@ proto tcp
 log-append client${id}.log
 remote tunnelbroker.ecs.soton.ac.uk 1194
 remote tunnelbroker.ecs.soton.ac.uk 443
-remote 152.78.180.112 1194
-remote 152.78.180.112 443
+remote 152.78.101.64 1194
+remote 152.78.101.64 443
 resolv-retry infinite
 nobind
 user nobody
@@ -106,8 +110,8 @@ config openvpn '${config_dir}'
     option log_append /var/log/${config_dir}_client${id}.log
     list remote 'tunnelbroker.ecs.soton.ac.uk 1194'
     list remote 'tunnelbroker.ecs.soton.ac.uk 443'
-    list remote '152.78.180.112 1194'
-    list remote '152.78.180.112 443'
+    list remote '152.78.101.64 1194'
+    list remote '152.78.101.64 443'
     option resolv_retry 'infinite'
     option nobind
     option user 'nobody'
