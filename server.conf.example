@@ -7,7 +7,7 @@ dev-node /dev/net/tun
 ca /etc/openvpn/tunnelbroker/ca/intermediate/certs/ca-chain.cert.pem
 cert /etc/openvpn/tunnelbroker/ca/intermediate/certs/server.cert.pem
 key /etc/openvpn/tunnelbroker/ca/intermediate/private/server.key.pem
-dh /etc/openvpn/tunnelbroker/dh1024.pem
+dh /etc/openvpn/tunnelbroker/dh2048.pem
 server 10.0.1.0 255.255.255.0
 server-ipv6 fd1b:4d83:cebc:9400::/64
 push "route-ipv6 ::/0"

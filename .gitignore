@@ -2,6 +2,7 @@ ca/
 ccd/*
 clients/*
 dh1024.pem
+dh2048.pem
 logs/*
 sbin/settings.sh
 server.conf
